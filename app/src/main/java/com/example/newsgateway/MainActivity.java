@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Story s = storyList.get(position);
-                        Intent intent = new Intent(MainActivity.this, CountryDetailActivity.class);
+                        Intent intent = new Intent(MainActivity.this, StoryDetailActivity.class);
                         intent.putExtra(Story.class.getName(), s);
                         startActivity(intent);
                         mDrawerLayout.closeDrawer(mDrawerList);

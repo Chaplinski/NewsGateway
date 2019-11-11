@@ -12,16 +12,40 @@ public class Story implements Serializable {
     private String source;
     private String headline;
     private String date;
-    private String authors;
-    private String text;
+    private String author;
+    private String story;
     private Bitmap image;
 
-    Story(String source, String headline, String date, String authors, String text, Bitmap image) {
+    Story(String source, String headline, String date, String author, String story, Bitmap image) {
         this.source = source;
         this.headline = headline;
         this.date = date;
-        this.authors = authors;
-        this.text = text;
+        this.author = author;
+        this.story = story;
         this.image = image;
+    }
+
+    String getSource(){
+        return source;
+    }
+
+    String getHeadline(){
+        return headline;
+    }
+
+    String getDate(){
+        return date;
+    }
+
+    String getAuthor(){
+        return author;
+    }
+
+    String getStory(){
+        return story;
+    }
+
+    Bitmap getImage(){
+        return image;
     }
 }
