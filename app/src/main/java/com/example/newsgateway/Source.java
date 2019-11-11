@@ -6,27 +6,21 @@ public class Source {
     private String name;
     private String category;
 
-    private void setID(String id){
+    Source(String id, String name, String category) {
         this.id = id;
-    }
-
-    private String getID(){
-        return this.id;
-    }
-
-    private void setName(String name){
         this.name = name;
-    }
-
-    private String getName(){
-        return this.name;
-    }
-
-    private void setCategory(String category){
         this.category = category;
     }
 
-    private String getCategory(){
-        return this.getCategory();
+    public String getID(){
+        return this.id;
+    }
+
+    public String getName(){
+        return this.name;
+    }
+
+    public String getCategory(){
+        return this.category;
     }
 }

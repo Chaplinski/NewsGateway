@@ -35,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
     private ListView mDrawerList;
     private Menu opt_menu;
     private ActionBarDrawerToggle mDrawerToggle;
-    ArrayList<Story> storyList = new ArrayList<>();
-    private HashMap<String, ArrayList<Story>> storyData = new HashMap<>();
+    ArrayList<Source> storyList = new ArrayList<>();
+    private HashMap<String, ArrayList<Source>> storyData = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +55,9 @@ public class MainActivity extends AppCompatActivity {
                 new ListView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Story s = storyList.get(position);
+                        Source s = storyList.get(position);
                         Intent intent = new Intent(MainActivity.this, StoryDetailActivity.class);
-                        intent.putExtra(Story.class.getName(), s);
+//                        intent.putExtra(Source.class.getName(), s);
                         startActivity(intent);
                         mDrawerLayout.closeDrawer(mDrawerList);
                     }
@@ -81,34 +81,32 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateData(ArrayList<Source> listIn) {
 
-//        for (Country c : listIn) {
-//            if (c.getSubRegion().isEmpty()) {
-//                c.setSubRegion("Unspecified");
-//            }
-//            if (!countryData.containsKey(c.getSubRegion())) {
-//                countryData.put(c.getSubRegion(), new ArrayList<Country>());
-//            }
-//            ArrayList<Country> cList = countryData.get(c.getSubRegion());
-//            if (cList != null) {
-//                cList.add(c);
-//            }
-//        }
-//
-//        countryData.put("All", listIn);
-//
-//        ArrayList<String> tempList = new ArrayList<>(countryData.keySet());
-//        Collections.sort(tempList);
-//        for (String s : tempList)
-//            opt_menu.add(s);
-//
-//
-//        countryList.addAll(listIn);
-//        mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_item, countryList));
-//
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//            getSupportActionBar().setHomeButtonEnabled(true);
-//        }
+        for (Source source : listIn) {
+
+            if (!storyData.containsKey(source.getCategory())) {
+                storyData.put(source.getCategory(), new ArrayList<Source>());
+            }
+            ArrayList<Source> sourceList = storyData.get(source.getCategory());
+            if (sourceList != null) {
+                sourceList.add(source);
+            }
+        }
+
+        storyData.put("All", listIn);
+
+        ArrayList<String> tempList = new ArrayList<>(storyData.keySet());
+        Collections.sort(tempList);
+        for (String s : tempList)
+            opt_menu.add(s);
+
+
+        storyList.addAll(listIn);
+        mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_item, storyList));
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
     }
 
     @Override

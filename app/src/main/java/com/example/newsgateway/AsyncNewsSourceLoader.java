@@ -90,16 +90,16 @@ public class AsyncNewsSourceLoader extends AsyncTask<String, Integer, String> {
 
             for (int i = 0; i < jSources.length(); i++) {
                 JSONObject jThisSource = (JSONObject) jSources.get(i);
-                String name = jThisSource.getString("id");
-                String capital = jThisSource.getString("name");
-                String region = jThisSource.getString("category");
+                String id = jThisSource.getString("id");
+                String name = jThisSource.getString("name");
+                String category = jThisSource.getString("category");
 
 
-//                storyList.add(
-//                        new Story(name, capital, population, region, subRegion,
-//                                area, citizen, codes.toString(), borders.toString()));
+                sourceList.add(
+                        new Source(id, name, category));
 
             }
+            Log.d(TAG, "parseJSON: success");
             return sourceList;
         } catch (Exception e) {
             e.printStackTrace();
