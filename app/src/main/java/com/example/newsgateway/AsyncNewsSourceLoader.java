@@ -99,7 +99,7 @@ public class AsyncNewsSourceLoader extends AsyncTask<String, Integer, String> {
                         new Source(id, name, category));
 
             }
-            Log.d(TAG, "parseJSON: success");
+            Log.d(TAG, "parseJSON: " + sourceList.size());
             return sourceList;
         } catch (Exception e) {
             e.printStackTrace();

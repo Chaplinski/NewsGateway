@@ -18,7 +18,7 @@ public class StoryDetailActivity extends AppCompatActivity {
         setContentView(R.layout.story_layout);
 
         Intent intent = getIntent();
-        if (intent.hasExtra(Story.class.getName())) {
+//        if (intent.hasExtra(Story.class.getName())) {
             Story s = (Story) intent.getSerializableExtra(Story.class.getName());
 
             TextView headline = findViewById(R.id.textViewHeadline);
@@ -36,7 +36,7 @@ public class StoryDetailActivity extends AppCompatActivity {
             ImageView image = findViewById(R.id.imageView);
             image.setImageBitmap(s.getImage());
 
-        }
+//        }
 
     }
 }

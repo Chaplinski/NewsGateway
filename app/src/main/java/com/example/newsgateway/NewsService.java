@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.TextView;
@@ -15,6 +16,9 @@ public class NewsService extends Service {
 
     private static final String TAG = "CountService";
     private boolean running = true;
+    static final String SOURCE_REQUEST = "SOURCE_REQUEST";
+    static final String SOURCE_ID = "SOURCE_ID";
+    static final String ACTION_MSG_TO_SERVICE = "ACTION_MSG_TO_SERVICE";
 //    private final ArrayList<Fruit> fruitList = new ArrayList<>();
     private int count = 1;
     private ServiceReceiver serviceReceiver;
@@ -28,11 +32,12 @@ public class NewsService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        serviceReceiver = new ServiceReceiver();
-
-        if (intent.hasExtra("ACTION_MSG_TO_SERVICE")) {
+//        if (intent.hasExtra(ACTION_MSG_TO_SERVICE)) {
             //register a ServiceReceiver broadcast receiver object using the intent filter
-        }
+            serviceReceiver = new ServiceReceiver();
+            IntentFilter filter1 = new IntentFilter(ACTION_MSG_TO_SERVICE);
+            registerReceiver(serviceReceiver, filter1);
+//        }
 
 
         //Creating new thread for my service
@@ -94,17 +99,21 @@ public class NewsService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
-//            String action = intent.getAction();
-//            if (action == null)
-//                return;
-//            switch (action) {
-//                case FRUIT_BROADCAST_FROM_SERVICE:
+            Log.d(TAG, "onReceive: received");
+            String action = intent.getAction();
+            if (action == null)
+                return;
+            switch (action) {
+                case SOURCE_REQUEST:
+                    String sId = "";
+                    if (intent.hasExtra(SOURCE_ID)) {
+                        sId = intent.getStringExtra(SOURCE_ID);
+                    }
+                    Log.d(TAG, "onReceive: " + sId);
 //                    Fruit newFruit = null;
 //                    int count = 0;
 //
-//                    if (intent.hasExtra(FRUIT_DATA))
-//                        newFruit = (Fruit) intent.getSerializableExtra(FRUIT_DATA);
+
 //
 //                    if (intent.hasExtra(COUNT_DATA))
 //                        count = intent.getIntExtra(COUNT_DATA, 0);
@@ -114,17 +123,17 @@ public class NewsService extends Service {
 //                                String.format(Locale.getDefault(),
 //                                        "%d)  %s", count, newFruit.toString()));
 //                    }
-//
-//                    break;
+
+                    break;
 //                case MESSAGE_BROADCAST_FROM_SERVICE:
 //                    String data = "";
 //                    if (intent.hasExtra(MESSAGE_DATA))
 //                        data = intent.getStringExtra(MESSAGE_DATA);
 //                    ((TextView) findViewById(R.id.textView)).setText(data);
 //                    break;
-//                default:
-//                    Log.d(TAG, "onReceive: Unknown broadcast received");
-//            }
+                default:
+                    Log.d(TAG, "onReceive: Unknown broadcast received");
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -35,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private ListView mDrawerList;
     private Menu opt_menu;
     private ActionBarDrawerToggle mDrawerToggle;
-    ArrayList<Source> storyList = new ArrayList<>();
-    private HashMap<String, ArrayList<Source>> storyData = new HashMap<>();
+    private ArrayList<Source> sourceList = new ArrayList<>();
+    private HashMap<String, ArrayList<Source>> sourceData = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawerList = findViewById(R.id.drawer_list);
 
         Intent intent = new Intent(MainActivity.this, NewsService.class);
+        intent.putExtra("ACTION_MSG_TO_SERVICE", NewsService.ACTION_MSG_TO_SERVICE);
         startService(intent);
 
         newsReceiver = new NewsReceiver();
@@ -55,10 +57,12 @@ public class MainActivity extends AppCompatActivity {
                 new ListView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Source s = storyList.get(position);
-                        Intent intent = new Intent(MainActivity.this, StoryDetailActivity.class);
+                        Source s = sourceList.get(position);
+                        Log.d(TAG, "onItemClick: " + s.getID());
+                        sendRequest(s.getID());
+//                        Intent intent = new Intent(MainActivity.this, StoryDetailActivity.class);
 //                        intent.putExtra(Source.class.getName(), s);
-                        startActivity(intent);
+//                        startActivity(intent);
                         mDrawerLayout.closeDrawer(mDrawerList);
                     }
                 }
@@ -73,40 +77,74 @@ public class MainActivity extends AppCompatActivity {
         );
 
         // Load the data
-        if (storyData.isEmpty())
+        if (sourceData.isEmpty())
             new AsyncNewsSourceLoader(this).execute();
 
 
+    }
+
+    private void sendRequest(String sId) {
+        Intent intent = new Intent();
+        intent.setAction(NewsService.ACTION_MSG_TO_SERVICE);
+        intent.putExtra(NewsService.SOURCE_ID, sId);
+        Log.d(TAG, "sendRequest: here");
+        sendBroadcast(intent);
     }
 
     public void updateData(ArrayList<Source> listIn) {
 
         for (Source source : listIn) {
 
-            if (!storyData.containsKey(source.getCategory())) {
-                storyData.put(source.getCategory(), new ArrayList<Source>());
+            if (!sourceData.containsKey(source.getCategory())) {
+                sourceData.put(source.getCategory(), new ArrayList<Source>());
             }
-            ArrayList<Source> sourceList = storyData.get(source.getCategory());
+            ArrayList<Source> sourceList = sourceData.get(source.getCategory());
             if (sourceList != null) {
                 sourceList.add(source);
             }
         }
+//        Log.d(TAG, "updateData: " + sourceData.get("business"));
+//        ArrayList<Source> foo = sourceData.get("business");
+//        Source fooSource = foo.get(0);
+//        Log.d(TAG, "updateData: " + fooSource.getName());
 
-        storyData.put("All", listIn);
+        sourceData.put("All", listIn);
 
-        ArrayList<String> tempList = new ArrayList<>(storyData.keySet());
+        ArrayList<String> tempList = new ArrayList<>(sourceData.keySet());
         Collections.sort(tempList);
         for (String s : tempList)
             opt_menu.add(s);
 
 
-        storyList.addAll(listIn);
-        mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_item, storyList));
+        sourceList.addAll(listIn);
+        mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_item, sourceList));
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
+    }
+    // You need the below to open the drawer when the toggle is clicked
+    // Same method is called when an options menu item is selected.
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            Log.d(TAG, "onOptionsItemSelected: mDrawerToggle " + item);
+            return true;
+        }
+
+        setTitle(item.getTitle());
+
+        sourceList.clear();
+        ArrayList<Source> tempList = sourceData.get(item.getTitle().toString());
+        if (tempList != null) {
+            sourceList.addAll(tempList);
+        }
+
+        ((ArrayAdapter) mDrawerList.getAdapter()).notifyDataSetChanged();
+        return super.onOptionsItemSelected(item);
+
     }
 
     @Override

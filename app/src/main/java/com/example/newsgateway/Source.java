@@ -1,6 +1,10 @@
 package com.example.newsgateway;
 
-public class Source {
+import java.io.Serializable;
+
+import androidx.annotation.NonNull;
+
+public class Source implements Serializable {
 
     private String id;
     private String name;
@@ -22,5 +26,10 @@ public class Source {
 
     public String getCategory(){
         return this.category;
+    }
+
+    @NonNull
+    public String toString() {
+        return name;
     }
 }
