@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 
 public class NewsService extends Service {
@@ -19,9 +21,10 @@ public class NewsService extends Service {
     static final String SOURCE_REQUEST = "SOURCE_REQUEST";
     static final String SOURCE_ID = "SOURCE_ID";
     static final String ACTION_MSG_TO_SERVICE = "ACTION_MSG_TO_SERVICE";
-//    private final ArrayList<Fruit> fruitList = new ArrayList<>();
+    private final ArrayList<Story> storyList = new ArrayList<>();
     private int count = 1;
     private ServiceReceiver serviceReceiver;
+    private String sSourceId = "";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -37,6 +40,7 @@ public class NewsService extends Service {
             serviceReceiver = new ServiceReceiver();
             IntentFilter filter1 = new IntentFilter(ACTION_MSG_TO_SERVICE);
             registerReceiver(serviceReceiver, filter1);
+        Log.d(TAG, "onStartCommand: receiver registered");
 //        }
 
 
@@ -50,9 +54,21 @@ public class NewsService extends Service {
                 while (running) {
 
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(250);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                    }
+                    if(storyList.size() > 0){
+                        Log.d(TAG, "run forrest: ");
+                        //run async task retrieving
+
+                        Intent intent = new Intent();
+                        intent.setAction(MainActivity.ACTION_MSG_TO_MAIN_ACTIVITY);
+                        intent.putParcelableArrayListExtra(MainActivity.STORIES, storyList);
+                        Log.d(TAG, "sendRequest: storyList " + MainActivity.ACTION_MSG_TO_MAIN_ACTIVITY);
+                        sendBroadcast(intent);
+
+                        storyList.removeAll(storyList);
                     }
                     // Get random index
 //                    int index = (int) (Math.random() * fruitList.size());
@@ -68,16 +84,6 @@ public class NewsService extends Service {
 
 
         return Service.START_STICKY;
-    }
-
-    private void sendNews() {
-//    private void sendNews(Fruit fruitToSend) {
-        Intent intent = new Intent();
-        intent.setAction(MainActivity.NEWS_BROADCAST_FROM_SERVICE);
-//        intent.putExtra(MainActivity.NEWS_DATA, fruitToSend);
-        intent.putExtra(MainActivity.COUNT_DATA, count++);
-
-        sendBroadcast(intent);
     }
 
     private void sendMessage(String msg) {
@@ -103,37 +109,29 @@ public class NewsService extends Service {
             String action = intent.getAction();
             if (action == null)
                 return;
+            Log.d(TAG, "onReceive action: " + action);
             switch (action) {
-                case SOURCE_REQUEST:
-                    String sId = "";
+                case ACTION_MSG_TO_SERVICE:
                     if (intent.hasExtra(SOURCE_ID)) {
-                        sId = intent.getStringExtra(SOURCE_ID);
+                        sSourceId = intent.getStringExtra(SOURCE_ID);
                     }
-                    Log.d(TAG, "onReceive: " + sId);
-//                    Fruit newFruit = null;
-//                    int count = 0;
-//
-
-//
-//                    if (intent.hasExtra(COUNT_DATA))
-//                        count = intent.getIntExtra(COUNT_DATA, 0);
-//
-//                    if (newFruit != null) {
-//                        ((TextView) findViewById(R.id.textView)).setText(
-//                                String.format(Locale.getDefault(),
-//                                        "%d)  %s", count, newFruit.toString()));
-//                    }
+                    Log.d(TAG, "onReceive3: " + sSourceId);
+                    //call async story task
+                    new AsyncStoryLoader(this, sSourceId).execute();
 
                     break;
-//                case MESSAGE_BROADCAST_FROM_SERVICE:
-//                    String data = "";
-//                    if (intent.hasExtra(MESSAGE_DATA))
-//                        data = intent.getStringExtra(MESSAGE_DATA);
-//                    ((TextView) findViewById(R.id.textView)).setText(data);
-//                    break;
                 default:
                     Log.d(TAG, "onReceive: Unknown broadcast received");
             }
+        }
+
+        public void updateData(ArrayList<Story> listIn) {
+
+            Log.d(TAG, "updateData4: " + listIn.size());
+            for(int i = 0; i < listIn.size(); i++){
+                storyList.add(listIn.get(i));
+            }
+
         }
     }
 }

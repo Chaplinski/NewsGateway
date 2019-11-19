@@ -7,6 +7,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,6 +30,10 @@ public class MainActivity extends AppCompatActivity {
     private NewsReceiver newsReceiver;
     static final String NEWS_BROADCAST_FROM_SERVICE = "NEWS_BROADCAST_FROM_SERVICE";
     static final String MESSAGE_BROADCAST_FROM_SERVICE = "MESSAGE_BROADCAST_FROM_SERVICE";
+    static final String ACTION_MSG_TO_SERVICE = "ACTION_MSG_TO_SERVICE";
+    static final String ACTION_MSG_TO_MAIN_ACTIVITY = "ACTION_MSG_TO_MAIN_ACTIVITY";
+    static final String ACTION_NEWS_STORY = "ACTION_NEWS_STORY";
+    static final String STORIES = "STORIES";
     static final String NEWS_DATA = "NEWS_DATA";
     static final String COUNT_DATA = "COUNT_DATA";
     static final String MESSAGE_DATA = "MESSAGE_DATA";
@@ -37,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private Menu opt_menu;
     private ActionBarDrawerToggle mDrawerToggle;
     private ArrayList<Source> sourceList = new ArrayList<>();
+    private ArrayList<Story> storyList = new ArrayList<>();
     private HashMap<String, ArrayList<Source>> sourceData = new HashMap<>();
 
     @Override
@@ -51,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
         startService(intent);
 
         newsReceiver = new NewsReceiver();
+        IntentFilter filter1 = new IntentFilter(ACTION_MSG_TO_MAIN_ACTIVITY);
+        registerReceiver(newsReceiver, filter1);
 
         // Set up the drawer item click callback method
         mDrawerList.setOnItemClickListener(
@@ -176,34 +184,22 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
+            Log.d(TAG, "scoopy: doopy");
             String action = intent.getAction();
+            Log.d(TAG, "onReceive action5: " + action);
             if (action == null)
                 return;
             switch (action) {
-                case NEWS_BROADCAST_FROM_SERVICE:
-                    Story newStory = null;
-                    int count = 0;
-
-                    if (intent.hasExtra(NEWS_DATA))
-                        newStory = (Story) intent.getSerializableExtra(NEWS_DATA);
-
-                    if (intent.hasExtra(COUNT_DATA))
-                        count = intent.getIntExtra(COUNT_DATA, 0);
-
-//                    if (newStory != null) {
-//                        ((TextView) findViewById(R.id.textView)).setText(
-//                                String.format(Locale.getDefault(),
-//                                        "%d)  %s", count, newStory.toString()));
-//                    }
-
+                case ACTION_MSG_TO_MAIN_ACTIVITY:
+                    if (intent.hasExtra(STORIES)) {
+                        Log.d(TAG, "onReceive stories: ");
+//                        storyList = intent.getStringArrayListExtra(STORIES);
+                        ArrayList<Story> temp = intent.getParcelableArrayListExtra(STORIES);
+                        Log.d(TAG, "onReceiverr: " + temp.size());
+                        temp.removeAll(temp);
+                    }
                     break;
-                case MESSAGE_BROADCAST_FROM_SERVICE:
-                    String data = "";
-                    if (intent.hasExtra(MESSAGE_DATA))
-                        data = intent.getStringExtra(MESSAGE_DATA);
-//                    ((TextView) findViewById(R.id.textView)).setText(data);
-                    break;
+
                 default:
                     Log.d(TAG, "onReceive: Unknown broadcast received");
             }

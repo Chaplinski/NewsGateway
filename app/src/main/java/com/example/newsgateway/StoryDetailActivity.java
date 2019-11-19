@@ -22,7 +22,7 @@ public class StoryDetailActivity extends AppCompatActivity {
             Story s = (Story) intent.getSerializableExtra(Story.class.getName());
 
             TextView headline = findViewById(R.id.textViewHeadline);
-            headline.setText(s.getHeadline());
+            headline.setText(s.getTitle());
 
             TextView date = findViewById(R.id.textViewDate);
             date.setText(s.getDate());
@@ -31,10 +31,10 @@ public class StoryDetailActivity extends AppCompatActivity {
             author.setText(s.getAuthor());
 
             TextView story = findViewById(R.id.textViewStory);
-            story.setText(s.getStory());
+            story.setText(s.getDescription());
 
-            ImageView image = findViewById(R.id.imageView);
-            image.setImageBitmap(s.getImage());
+//            ImageView image = findViewById(R.id.imageView);
+//            image.setImageBitmap(s.getImage());
 
 //        }
 
