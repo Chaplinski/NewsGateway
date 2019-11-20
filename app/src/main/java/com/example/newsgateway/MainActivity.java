@@ -1,8 +1,13 @@
 package com.example.newsgateway;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,9 +16,11 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -22,6 +29,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -44,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Source> sourceList = new ArrayList<>();
     private ArrayList<Story> storyList = new ArrayList<>();
     private HashMap<String, ArrayList<Source>> sourceData = new HashMap<>();
+    private List<Fragment> fragments;
+    private MyPageAdapter pageAdapter;
+    private ViewPager pager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,12 +76,10 @@ public class MainActivity extends AppCompatActivity {
                 new ListView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        pager.setBackground(null);
                         Source s = sourceList.get(position);
                         Log.d(TAG, "onItemClick: " + s.getID());
                         sendRequest(s.getID());
-//                        Intent intent = new Intent(MainActivity.this, StoryDetailActivity.class);
-//                        intent.putExtra(Source.class.getName(), s);
-//                        startActivity(intent);
                         mDrawerLayout.closeDrawer(mDrawerList);
                     }
                 }
@@ -84,11 +93,51 @@ public class MainActivity extends AppCompatActivity {
                 R.string.drawer_close  /* "close drawer" description for accessibility */
         );
 
+        fragments = new ArrayList<>();
+
+
+        pageAdapter = new MyPageAdapter(getSupportFragmentManager());
+        pager = findViewById(R.id.container);
+        pager.setAdapter(pageAdapter);
+
         // Load the data
         if (sourceData.isEmpty())
             new AsyncNewsSourceLoader(this).execute();
 
 
+    }
+
+    public void setStories(ArrayList<Story> storyList) {
+
+        //setTitle(currentSubRegion);
+
+        for (int i = 0; i < pageAdapter.getCount(); i++)
+            pageAdapter.notifyChangeInPosition(i);
+
+        fragments.clear();
+
+        for (int i = 0; i < storyList.size(); i++) {
+            fragments.add(
+                    StoryFragment.newInstance(storyList.get(i), i+1, storyList.size()));
+            //pageAdapter.notifyChangeInPosition(i);
+        }
+
+        pageAdapter.notifyDataSetChanged();
+        pager.setCurrentItem(0);
+    }
+
+    @Override
+    protected void onResume() {
+        Intent intent = new Intent(MainActivity.this, NewsService.class);
+        intent.putExtra("ACTION_MSG_TO_SERVICE", NewsService.ACTION_MSG_TO_SERVICE);
+        startService(intent);
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(newsReceiver);
+        super.onStop();
     }
 
     private void sendRequest(String sId) {
@@ -194,9 +243,15 @@ public class MainActivity extends AppCompatActivity {
                     if (intent.hasExtra(STORIES)) {
                         Log.d(TAG, "onReceive stories: ");
 //                        storyList = intent.getStringArrayListExtra(STORIES);
-                        ArrayList<Story> temp = intent.getParcelableArrayListExtra(STORIES);
-                        Log.d(TAG, "onReceiverr: " + temp.size());
-                        temp.removeAll(temp);
+                        storyList = intent.getParcelableArrayListExtra(STORIES);
+
+                        setStories(storyList);
+                        Log.d(TAG, "onReceiverr: " + storyList.size());
+                        Story story = storyList.get(0);
+                        Log.d(TAG, "onReceive story description: " + story.getDescription());
+
+                        //todo call reDoFragments passing the list of articles (page 5 of documentation)
+                        storyList.clear();
                     }
                     break;
 
@@ -205,4 +260,49 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    //////////////////////////////////////
+
+    private class MyPageAdapter extends FragmentPagerAdapter {
+        private long baseId = 0;
+
+
+        MyPageAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public int getItemPosition(@NonNull Object object) {
+            return POSITION_NONE;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return fragments.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            //return 10;
+            return fragments.size();
+        }
+
+        @Override
+        public long getItemId(int position) {
+            // give an ID different from position when position has been changed
+            return baseId + position;
+        }
+
+        /**
+         * Notify that the position of a fragment has been changed.
+         * Create a new ID for each position to force recreation of the fragment
+         * @param n number of items which have been changed
+         */
+        void notifyChangeInPosition(int n) {
+            // shift the ID returned by getItemId outside the range of all previous fragments
+            baseId += getCount() + n;
+        }
+
+    }
 }
+

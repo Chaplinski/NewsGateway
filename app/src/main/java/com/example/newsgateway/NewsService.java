@@ -65,17 +65,17 @@ public class NewsService extends Service {
                         Intent intent = new Intent();
                         intent.setAction(MainActivity.ACTION_MSG_TO_MAIN_ACTIVITY);
                         intent.putParcelableArrayListExtra(MainActivity.STORIES, storyList);
-                        Log.d(TAG, "sendRequest: storyList " + MainActivity.ACTION_MSG_TO_MAIN_ACTIVITY);
+//                        Log.d(TAG, "sendRequest: storyList " + MainActivity.ACTION_MSG_TO_MAIN_ACTIVITY);
                         sendBroadcast(intent);
 
-                        storyList.removeAll(storyList);
+                        storyList.clear();
                     }
                     // Get random index
 //                    int index = (int) (Math.random() * fruitList.size());
 //                    sendFruit(fruitList.get(index)); // Send fruit at index
                 }
 
-                sendMessage("Service Thread Stopped");
+//                sendMessage("Service Thread Stopped");
 
 
                 Log.d(TAG, "run: Ending loop");
@@ -86,16 +86,17 @@ public class NewsService extends Service {
         return Service.START_STICKY;
     }
 
-    private void sendMessage(String msg) {
-        Intent intent = new Intent();
-        intent.setAction(MainActivity.MESSAGE_BROADCAST_FROM_SERVICE);
-        intent.putExtra(MainActivity.MESSAGE_DATA, msg);
-        sendBroadcast(intent);
-    }
+//    private void sendMessage(String msg) {
+//        Intent intent = new Intent();
+//        intent.setAction(MainActivity.MESSAGE_BROADCAST_FROM_SERVICE);
+//        intent.putExtra(MainActivity.MESSAGE_DATA, msg);
+//        sendBroadcast(intent);
+//    }
 
     @Override
     public void onDestroy() {
-        sendMessage("Service Destroyed");
+        unregisterReceiver(serviceReceiver);
+//        sendMessage("Service Destroyed");
         running = false;
         super.onDestroy();
     }
