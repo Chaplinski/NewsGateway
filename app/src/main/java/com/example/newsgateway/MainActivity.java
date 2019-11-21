@@ -115,14 +115,20 @@ public class MainActivity extends AppCompatActivity {
 
         setTitle(sSource);
 
+
         for (int i = 0; i < pageAdapter.getCount(); i++)
             pageAdapter.notifyChangeInPosition(i);
 
         fragments.clear();
 
-        for (int i = 0; i < storyList.size(); i++) {
+        int iStoryListSize = storyList.size();
+        if(iStoryListSize > 10){
+            iStoryListSize = 10;
+        }
+
+        for (int i = 0; i < iStoryListSize; i++) {
             fragments.add(
-                    StoryFragment.newInstance(storyList.get(i), i+1, storyList.size()));
+                    StoryFragment.newInstance(storyList.get(i), i+1, iStoryListSize));
             //pageAdapter.notifyChangeInPosition(i);
         }
 

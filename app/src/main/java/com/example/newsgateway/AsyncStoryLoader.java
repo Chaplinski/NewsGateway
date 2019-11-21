@@ -13,7 +13,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import static android.content.ContentValues.TAG;
 
@@ -100,6 +104,12 @@ public class AsyncStoryLoader extends AsyncTask<String, Integer, String> {
                 String urlToImage = jThisSource.getString("urlToImage");
                 String publishedAt = jThisSource.getString("publishedAt");
 
+//                DateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.US);
+//                DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+//                Date date = inputFormat.parse(publishedAt);
+//                String outputText = outputFormat.format(date);
+//
+//                Log.d(TAG, "parseJSON: " + outputText);
 
                 storyList.add(
                         new Story(author, title, description, url, urlToImage, publishedAt));
@@ -108,6 +118,7 @@ public class AsyncStoryLoader extends AsyncTask<String, Integer, String> {
             Log.d(TAG, "parseJSON: " + storyList.size());
             return storyList;
         } catch (Exception e) {
+            Log.d(TAG, "parseJSON2: " + e);
             e.printStackTrace();
         }
         return null;
