@@ -54,16 +54,26 @@ public class StoryFragment extends Fragment {
             int total = args.getInt("TOTAL_COUNT");
 
             TextView textViewHeadline = fragment_layout.findViewById(R.id.textViewHeadline);
-
             textViewHeadline.setText(currentStory.getTitle());
             TextView textViewDate = fragment_layout.findViewById(R.id.textViewDate);
             textViewDate.setText(currentStory.getDate());
 
             TextView textViewAuthor = fragment_layout.findViewById(R.id.textViewAuthor);
-            textViewAuthor.setText(currentStory.getAuthor());
+            if(!(currentStory.getAuthor().equals(null) || currentStory.getAuthor().equals("null"))) {
+                textViewAuthor.setText(currentStory.getAuthor());
+            } else {
+                textViewAuthor.setText("");
+            }
 
             TextView textViewStory = fragment_layout.findViewById(R.id.textViewStory);
-            textViewStory.setText(currentStory.getDescription());
+            if(!(currentStory.getDescription().equals(null) || currentStory.getDescription().equals("null"))) {
+                textViewStory.setText(currentStory.getDescription());
+            } else {
+                textViewStory.setText("");
+            }
+
+            TextView textViewCount = fragment_layout.findViewById(R.id.textViewCount);
+            textViewCount.setText(index + " of " + total);
 
 //
 //

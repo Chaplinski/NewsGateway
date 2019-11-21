@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Fragment> fragments;
     private MyPageAdapter pageAdapter;
     private ViewPager pager;
+    private String sSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         pager.setBackground(null);
                         Source s = sourceList.get(position);
+                        sSource = s.getName();
                         Log.d(TAG, "onItemClick: " + s.getID());
                         sendRequest(s.getID());
                         mDrawerLayout.closeDrawer(mDrawerList);
@@ -109,7 +111,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void setStories(ArrayList<Story> storyList) {
 
-        //setTitle(currentSubRegion);
+        Log.d(TAG, "setStories: " + sSource);
+
+        setTitle(sSource);
 
         for (int i = 0; i < pageAdapter.getCount(); i++)
             pageAdapter.notifyChangeInPosition(i);
@@ -247,8 +251,8 @@ public class MainActivity extends AppCompatActivity {
 
                         setStories(storyList);
                         Log.d(TAG, "onReceiverr: " + storyList.size());
-                        Story story = storyList.get(0);
-                        Log.d(TAG, "onReceive story description: " + story.getDescription());
+//                        Story story = storyList.get(0);
+//                        Log.d(TAG, "onReceive story description: " + story.getDescription());
 
                         //todo call reDoFragments passing the list of articles (page 5 of documentation)
                         storyList.clear();
@@ -283,7 +287,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            //return 10;
             return fragments.size();
         }
 

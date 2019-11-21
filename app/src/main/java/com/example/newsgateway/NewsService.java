@@ -95,7 +95,7 @@ public class NewsService extends Service {
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(serviceReceiver);
+//        unregisterReceiver(serviceReceiver);
 //        sendMessage("Service Destroyed");
         running = false;
         super.onDestroy();

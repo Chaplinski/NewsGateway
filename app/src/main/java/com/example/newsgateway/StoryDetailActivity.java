@@ -30,6 +30,9 @@ public class StoryDetailActivity extends AppCompatActivity {
             TextView story = findViewById(R.id.textViewStory);
             story.setText(s.getDescription());
 
+        TextView textViewCount = findViewById(R.id.textViewCount);
+        textViewCount.setText(s.getDescription());
+
 //            ImageView image = findViewById(R.id.imageView);
 //            image.setImageBitmap(s.getImage());
 
