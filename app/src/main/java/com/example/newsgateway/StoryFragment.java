@@ -60,6 +60,12 @@ public class StoryFragment extends Fragment {
 
             TextView textViewHeadline = fragment_layout.findViewById(R.id.textViewHeadline);
             textViewHeadline.setText(currentStory.getTitle());
+            textViewHeadline.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    clickItem(currentStory.getUrl());
+                }
+            });
             TextView textViewDate = fragment_layout.findViewById(R.id.textViewDate);
             textViewDate.setText(currentStory.getDate());
 
@@ -73,6 +79,12 @@ public class StoryFragment extends Fragment {
             TextView textViewStory = fragment_layout.findViewById(R.id.textViewStory);
             if(!(currentStory.getDescription().equals(null) || currentStory.getDescription().equals("null"))) {
                 textViewStory.setText(currentStory.getDescription());
+                textViewStory.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        clickItem(currentStory.getUrl());
+                    }
+                });
             } else {
                 textViewStory.setText("");
             }
@@ -83,6 +95,12 @@ public class StoryFragment extends Fragment {
             ImageView imageView = fragment_layout.findViewById(R.id.imageView);
             if(!currentStory.getUrlToImage().isEmpty()) {
                 Picasso.get().load(currentStory.getUrlToImage()).fit().into(imageView);
+                imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        clickItem(currentStory.getUrl());
+                    }
+                });
             } else {
                 imageView.setVisibility(View.GONE);
             }
@@ -102,6 +120,13 @@ public class StoryFragment extends Fragment {
         } else {
             return null;
         }
+    }
+
+    public void clickItem(String url) {
+
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browserIntent);
+
     }
 
 

@@ -138,6 +138,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        newsReceiver = new NewsReceiver();
+        IntentFilter filter1 = new IntentFilter(ACTION_MSG_TO_MAIN_ACTIVITY);
+        registerReceiver(newsReceiver, filter1);
+
         Intent intent = new Intent(MainActivity.this, NewsService.class);
         intent.putExtra("ACTION_MSG_TO_SERVICE", NewsService.ACTION_MSG_TO_SERVICE);
         startService(intent);

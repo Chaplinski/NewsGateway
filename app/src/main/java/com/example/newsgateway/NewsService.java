@@ -31,15 +31,21 @@ public class NewsService extends Service {
         return null;
     }
 
+    @Override
+    public void onCreate(){
+        serviceReceiver = new ServiceReceiver();
+        IntentFilter filter1 = new IntentFilter(ACTION_MSG_TO_SERVICE);
+        registerReceiver(serviceReceiver, filter1);
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
 //        if (intent.hasExtra(ACTION_MSG_TO_SERVICE)) {
             //register a ServiceReceiver broadcast receiver object using the intent filter
-            serviceReceiver = new ServiceReceiver();
-            IntentFilter filter1 = new IntentFilter(ACTION_MSG_TO_SERVICE);
-            registerReceiver(serviceReceiver, filter1);
+//            serviceReceiver = new ServiceReceiver();
+//            IntentFilter filter1 = new IntentFilter(ACTION_MSG_TO_SERVICE);
+//            registerReceiver(serviceReceiver, filter1);
         Log.d(TAG, "onStartCommand: receiver registered");
 //        }
 
@@ -95,7 +101,7 @@ public class NewsService extends Service {
 
     @Override
     public void onDestroy() {
-//        unregisterReceiver(serviceReceiver);
+        unregisterReceiver(serviceReceiver);
 //        sendMessage("Service Destroyed");
         running = false;
         super.onDestroy();
