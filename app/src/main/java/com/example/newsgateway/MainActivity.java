@@ -1,6 +1,7 @@
 package com.example.newsgateway;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private MyPageAdapter pageAdapter;
     private ViewPager pager;
     private String sSource;
+    private String sCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,9 +106,51 @@ public class MainActivity extends AppCompatActivity {
 
         // Load the data
         if (sourceData.isEmpty())
+            Log.d(TAG, "onCreate: source list size is " + sourceList.size());
             new AsyncNewsSourceLoader(this).execute();
 
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState: ");
+        outState.putString("CURRENTCATEGORY", sCategory);
+        outState.putParcelableArrayList("SOURCELIST", sourceList);
+        Log.d(TAG, "onSaveInstanceState: " + sourceList.size());
+
+        // Call super last
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Call super first
+        super.onRestoreInstanceState(savedInstanceState);
+        sCategory = savedInstanceState.getString("CURRENTCATEGORY");
+        setTitle(sCategory);
+
+        if(sCategory == null){
+            setTitle("News Gateway");
+        }
+
+        sourceList = savedInstanceState.getParcelableArrayList("SOURCELIST");
+        Log.d(TAG, "onRestoreInstanceState: " + sourceList.size());
+//        sourceList.addAll(listIn);
+        mDrawerList.setAdapter(null);
+
+        mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_item, sourceList));
+
+        ((ArrayAdapter) mDrawerList.getAdapter()).notifyDataSetChanged();
+//
+//        textDegreesTop.setText(savedInstanceState.getString("TEXTDEGREESTOP"));
+//        textDegreesBottom.setText(savedInstanceState.getString("TEXTDEGREESBOTTOM"));
+//        textResult.setText(savedInstanceState.getString("TEXTRESULT"));
+//        textConversionHistory.setText(savedInstanceState.getString("TEXTHISTORY"));
+//
+//        conversionHistory = savedInstanceState.getStringArrayList("ARRAYHISTORY");
+//
+//        radioValue = savedInstanceState.getInt("RADIOVALUE");
     }
 
     public void setStories(ArrayList<Story> storyList) {
@@ -169,9 +213,9 @@ public class MainActivity extends AppCompatActivity {
             if (!sourceData.containsKey(source.getCategory())) {
                 sourceData.put(source.getCategory(), new ArrayList<Source>());
             }
-            ArrayList<Source> sourceList = sourceData.get(source.getCategory());
-            if (sourceList != null) {
-                sourceList.add(source);
+            ArrayList<Source> sourceList2 = sourceData.get(source.getCategory());
+            if (sourceList2 != null) {
+                sourceList2.add(source);
             }
         }
 //        Log.d(TAG, "updateData: " + sourceData.get("business"));
@@ -186,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
         for (String s : tempList)
             opt_menu.add(s);
 
-
+        sourceList.clear();
         sourceList.addAll(listIn);
         mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_item, sourceList));
 
@@ -194,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
+
     }
     // You need the below to open the drawer when the toggle is clicked
     // Same method is called when an options menu item is selected.
@@ -205,7 +250,9 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
-        setTitle(item.getTitle());
+        sCategory = item.getTitle().toString();
+
+        setTitle(sCategory);
 
         sourceList.clear();
         ArrayList<Source> tempList = sourceData.get(item.getTitle().toString());
